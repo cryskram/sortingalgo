@@ -103,3 +103,65 @@ export const insertionSort = async (
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 };
+
+export const mergeSort = async (
+  array: number[],
+  setValues: (values: number[]) => void,
+  delay: number
+) => {
+  const arr = [...array];
+
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  const merge = async (left: number, mid: number, right: number) => {
+    const n1 = mid - left + 1;
+    const n2 = right - mid;
+
+    const L = arr.slice(left, mid + 1);
+    const R = arr.slice(mid + 1, right + 1);
+
+    let i = 0,
+      j = 0,
+      k = left;
+
+    while (i < n1 && j < n2) {
+      if (L[i] <= R[j]) {
+        arr[k] = L[i];
+        i++;
+      } else {
+        arr[k] = R[j];
+        j++;
+      }
+      setValues([...arr]);
+      await sleep(delay);
+      k++;
+    }
+
+    while (i < n1) {
+      arr[k] = L[i];
+      i++;
+      k++;
+      setValues([...arr]);
+      await sleep(delay);
+    }
+
+    while (j < n2) {
+      arr[k] = R[j];
+      j++;
+      k++;
+      setValues([...arr]);
+      await sleep(delay);
+    }
+  };
+
+  const sort = async (left: number, right: number) => {
+    if (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      await sort(left, mid);
+      await sort(mid + 1, right);
+      await merge(left, mid, right);
+    }
+  };
+
+  await sort(0, arr.length - 1);
+};
